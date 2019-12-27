@@ -21,9 +21,16 @@ class ScheduleReader
 
     public function getSchedule()
     {
-        $sche = new ScheduleGenerator(5,20);
+        $sche = new ScheduleGenerator(5,5);
+        $set =
         $result = $sche->generate();
         $result = $sche->getScheduleObjects();
         return $result;
+    }
+
+    public function read()
+    {
+        $ser = Storage::get('serial.txt');
+        return \Opis\Closure\unserialize($ser);
     }
 }

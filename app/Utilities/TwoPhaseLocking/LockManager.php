@@ -73,8 +73,8 @@ class LockManager
             if ($this->readDenyList[$operation->getTransaction()] > 0){
                 $this->readDenyList[$operation->getTransaction()] = 0;
             }
-            foreach ($this->writeDenyList as $key => $item) {
-                if ($item == $operation->getOperation()) $this->removeFromWriteLockQueue($operation->getOperation(),$key);
+            foreach ($this->writeLockQueue as $key => $item) {
+                if ($item == $operation->getTransaction()) $this->removeFromWriteLockQueue($operation->getTransaction(),$key);
             }
             foreach ($this->readLockQueue as $key=>$item) {
                 foreach ($item as $tr) {
@@ -150,10 +150,9 @@ class LockManager
     {
         if ($type == "r" && key_exists($item,$this->readLockQueue)){
             try {
-
                 return in_array($transaction, $this->readLockQueue[$item]);
             }catch (\Exception $exception){
-                dd($this->readLockQueue[$item],$transaction);
+                dd($exception);
             }
         }elseif ($type == "w"){
             return key_exists($item,$this->writeLockQueue) && $this->writeLockQueue[$item] == $transaction;
@@ -193,5 +192,30 @@ class LockManager
     private function AddToWriteLockQueue($transaction,$item)
     {
         $this->writeLockQueue[$item] = $transaction;
+    }
+
+    public function unlockAll($transaction)
+    {
+        if ($this->writeDenyList[$transaction] > 0){
+            $this->writeDenyList[$transaction] = 0;
+        }
+        if ($this->readDenyList[$transaction] > 0){
+            $this->readDenyList[$transaction] = 0;
+        }
+        foreach ($this->writeLockQueue as $key => $item) {
+            if ($item == $transaction) $this->removeFromWriteLockQueue($transaction,$key);
+        }
+        foreach ($this->readLockQueue as $key=>$item) {
+            foreach ($item as $tr) {
+                if ($transaction == $tr){
+                    $this->removeFromReadLockQueue($transaction,$key);
+                }
+            }
+        }
+    }
+
+    public function hasLocked(Operation $operation)
+    {
+        return $this->isLocked($operation->getOperation(),$operation->getTransaction(),$operation->getItem());
     }
 }

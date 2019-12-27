@@ -23,9 +23,6 @@ class Basic2PL
         $this->schedules = $schedules;
     }
 
-    /**
-     * @return mixed
-     */
     public function getSchedules()
     {
         return $this->schedules;
@@ -47,6 +44,7 @@ class Basic2PL
 
     public function execute($schedule)
     {
+        $this->executionList = [];
         $lockManager = new LockManager();
         $s_start = microtime(TRUE);
         foreach ($schedule as $operation) {
@@ -108,7 +106,7 @@ class Basic2PL
     private function unlockString(Operation $operation)
     {
         if ($operation->getOperation() == "w" || $operation->getOperation() == "r") {
-            return $operation->getOperation() . "u(" . $operation->getOperation() . "," . $operation->getItem() . ")";
+            return $operation->getOperation() . "u(" . $operation->getTransaction() . "," . $operation->getItem() . ")";
         }
         return "";
     }
