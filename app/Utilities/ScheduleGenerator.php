@@ -23,10 +23,18 @@ class ScheduleGenerator
     private $scheduleNumber;
     private $operationNumber;
 
+    private $scheduleCounter = 0;
+    private $scheduleObjects = [[]];
+
     public function __construct($scheduleNumber = 10, $operationNumber = 20)
     {
         $this->scheduleNumber = $scheduleNumber;
         $this->operationNumber = $operationNumber;
+    }
+
+    public function getScheduleObjects()
+    {
+        return $this->scheduleObjects;
     }
 
     private function getTransaction()
@@ -134,8 +142,12 @@ class ScheduleGenerator
     private function makeOperation($transaction, $opr, $item)
     {
         if ($opr == "c" || $opr == "a") {
+            $operation = new Operation($opr,$transaction,null);
+            $this->scheduleObjects[$this->scheduleCounter][] = $operation;
             return $opr . "(" . $transaction . ")";
         } else {
+            $operation = new Operation($opr,$transaction,$item);
+            $this->scheduleObjects[$this->scheduleCounter][] = $operation;
             return $opr . "(" . $transaction . "," . $item . ")";
         }
     }
@@ -169,6 +181,7 @@ class ScheduleGenerator
             }
             $schedule .= $this->completeSchedule();
             $this->result[] = $schedule.";";
+            $this->scheduleCounter++;
         }
 
         return $this->result;

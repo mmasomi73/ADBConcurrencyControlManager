@@ -71,4 +71,13 @@ class Operation
         if ($this->operation == "c") return $this->commit();
         if ($this->operation == "a") return $this->abort();
     }
+
+    public function toString()
+    {
+        if ($this->operation == "c" || $this->operation == "a") {
+            return $this->operation . "(" . $this->transaction . ")";
+        } else {
+            return $this->operation . "(" . $this->transaction . "," . $this->item . ")";
+        }
+    }
 }

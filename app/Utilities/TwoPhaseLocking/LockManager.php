@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Utilities\TwoPhaseLocking;
 
 
@@ -8,13 +7,15 @@ use App\Utilities\Operation;
 
 class LockManager
 {
+    private $downUpgrading = false;
     private $readLockQueue = [[]];
     private $writeLockQueue = [];
     private $writeDenyList = [];
     private $readDenyList = [];
 
-    public function __construct()
+    public function __construct($downUpgrading = false)
     {
+        $this->downUpgrading = $downUpgrading;
         for ($i = 1;$i<8;$i++){
             $this->readDenyList[$i.""] = 0;
             $this->writeDenyList[$i.""] = 0;
@@ -22,26 +23,68 @@ class LockManager
         }
     }
 
+    public function lock(Operation $operation)
+    {
+        if ($operation->getOperation() == "r") return $this->sharedLock($operation);
+        if ($operation->getOperation() == "w") return $this->exclusiveLock($operation);
+        if ($operation->getOperation() == "c" || $operation->getOperation() == "a")
+            return "finish";
+    }
+
     public function sharedLock(Operation $operation)
     {
-
-        if ($this->checkLock('s',$operation->getTransaction(),$operation->getItem())){
-            return 'w';
+        if ($this->checkLock("r",$operation->getTransaction(),$operation->getItem())){
+            return 'wait';
         }
-        return 'w';
+        $this->AddToReadLockQueue($operation->getTransaction(),$operation->getItem());
+        return 'locked';
 
     }
 
-    public function exclusiveLock($transaction,$item)
+    public function exclusiveLock(Operation $operation)
     {
-
+        if ($this->checkLock('w',$operation->getTransaction(),$operation->getItem())){
+            return 'wait';
+        }
+        $this->AddToWriteLockQueue($operation->getTransaction(),$operation->getItem());
+        return 'locked';
     }
 
-    public function unLock($transaction,$item)
+    public function unLock(Operation $operation)
     {
-
+        if ($operation->getOperation() == "w"){
+            if ($this->writeDenyList[$operation->getTransaction()] > 0){
+                $this->writeDenyList[$operation->getTransaction()] = $this->writeDenyList[$operation->getTransaction()] - 1;
+            }else{
+                $this->removeFromWriteLockQueue($operation->getTransaction(),$operation->getItem());
+            }
+        }
+        if ($operation->getOperation() == "r"){
+            if ($this->readDenyList[$operation->getTransaction()] > 0){
+                $this->readDenyList[$operation->getTransaction()] = $this->readDenyList[$operation->getTransaction()] - 1;
+            }else{
+                $this->removeFromReadLockQueue($operation->getTransaction(),$operation->getItem());
+            }
+        }
+        if ($operation->getOperation() == "c" || $operation->getOperation() == "a"){
+            if ($this->writeDenyList[$operation->getTransaction()] > 0){
+                $this->writeDenyList[$operation->getTransaction()] = 0;
+            }
+            if ($this->readDenyList[$operation->getTransaction()] > 0){
+                $this->readDenyList[$operation->getTransaction()] = 0;
+            }
+            foreach ($this->writeDenyList as $key => $item) {
+                if ($item == $operation->getOperation()) $this->removeFromWriteLockQueue($operation->getOperation(),$key);
+            }
+            foreach ($this->readLockQueue as $key=>$item) {
+                foreach ($item as $tr) {
+                    if ($operation->getTransaction() == $tr){
+                        $this->removeFromReadLockQueue($operation->getTransaction(),$key);
+                    }
+                }
+            }
+        }
     }
-
 
     /**
      * Check item is locked by another transaction: TRUE: not Can Lock, FALSE: Can lock
@@ -59,19 +102,19 @@ class LockManager
          *      3. if item has exclusive lock and want to give shared lock  : Can Give
          *      NOTE: in State 3: we propose not exist any Transaction in Read lock Queue of that item
          */
-        if ($type == "s"){
+        if ($type == "r"){
             // if item write_lock by another transaction can't give them
             if ($this->checkWriteLockQueue($transaction,$item)) return true;
 
             // if this transaction lock this item previous in shared mode, add to DENY_LIST and can give lock
-            elseif ($this->isLocked("s",$transaction,$item)){
-                $this->readenyList[$transaction] = $this->readenyList[$transaction] + 1;
+            elseif ($this->isLocked("r",$transaction,$item)){
+                $this->readDenyList[$transaction] = $this->readDenyList[$transaction] + 1;
                 return false;
             }
             // if this transaction lock this item previous in exclusive mode, can give lock
             elseif ($this->isLocked("w",$transaction,$item)){
                 // Downgrade Lock => in practice remove from Write Lock Queue
-                $this->removeFromWriteLockQueue($transaction,$item);
+                $this->downUpgrading ? $this->removeFromWriteLockQueue($transaction,$item) : null;
                 return false;
             }
         }
@@ -88,34 +131,34 @@ class LockManager
             if ($this->checkWriteLockQueue($transaction,$item)) return true;
 
             // if this transaction lock this item previous in shared mode, add to DENY_LIST and can give lock
-            elseif ($this->isLocked("s",$transaction,$item)){
-                $this->denyList[$transaction] = $this->denyList[$transaction] + 1;
+            elseif ($this->isLocked("r",$transaction,$item)){
+                // Upgrading Lock
+                $this->downUpgrading ? $this->removeFromReadLockQueue($transaction,$item) :null;
                 return false;
             }
 
             // if this transaction lock this item previous in exclusive mode, can give lock
             elseif ($this->isLocked("w",$transaction,$item)){
-                // Downgrade Lock => in practice remove from Write Lock Queue
-                $this->removeFromWriteLockQueue($transaction,$item);
+                $this->writeDenyList[$transaction] = $this->writeDenyList[$transaction] + 1;
                 return false;
             }
-        }
-        return true;
-    }
-    private function isLocked($type,$transaction,$item)
-    {
-        if ($type == "s"){
-            return in_array($transaction, $this->readLockQueue[$item]);
-        }elseif ($type == "w"){
-            return key_exists($item,$this->readLockQueue[$item]) && $this->readLockQueue[$item] == $transaction;
         }
         return false;
     }
 
-    private function checkUnlock($type,$transaction,$item)
+    private function isLocked($type,$transaction,$item)
     {
-        $queue = $type == "s" ? $this->readLockQueue[$item] : $this->writeLockQueue[$item];
-        $number =  array_count_values($queue);
+        if ($type == "r" && key_exists($item,$this->readLockQueue)){
+            try {
+
+                return in_array($transaction, $this->readLockQueue[$item]);
+            }catch (\Exception $exception){
+                dd($this->readLockQueue[$item],$transaction);
+            }
+        }elseif ($type == "w"){
+            return key_exists($item,$this->writeLockQueue) && $this->writeLockQueue[$item] == $transaction;
+        }
+        return false;
     }
 
     private function checkWriteLockQueue($transaction,$item){
@@ -128,8 +171,27 @@ class LockManager
     private function removeFromWriteLockQueue($transaction,$item)
     {
         if (key_exists($item,$this->writeLockQueue) && $this->writeLockQueue[$item] == $transaction )
-        $this->writeLockQueue[$item] = "";
+            unset($this->writeLockQueue[$item]);
     }
 
+    private function removeFromReadLockQueue($transaction,$item)
+    {
 
+        if (key_exists($item,$this->readLockQueue))
+            $index = array_search($transaction, $this->readLockQueue[$item]);
+            if ($index >= 0){
+                unset($this->readLockQueue[$item][$index]);
+                if (count($this->readLockQueue[$item]) == 0) unset($this->readLockQueue[$item]);
+            }
+    }
+
+    private function AddToReadLockQueue($transaction,$item)
+    {
+        $this->readLockQueue[$item][] = $transaction;
+    }
+
+    private function AddToWriteLockQueue($transaction,$item)
+    {
+        $this->writeLockQueue[$item] = $transaction;
+    }
 }
