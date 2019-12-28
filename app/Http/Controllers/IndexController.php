@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Utilities\ScheduleGenerator;
 use App\Utilities\ScheduleReader;
+use App\Utilities\TimeStampOrdering\TimeStampManager;
 use App\Utilities\TwoPhaseLocking\Basic2PL;
 use App\Utilities\TwoPhaseLocking\Conservative2PL;
 use App\Utilities\TwoPhaseLocking\LockManager;
@@ -47,5 +48,13 @@ class IndexController extends Controller
 //        $strict2PL->run();
 //        dd($strict2PL->getTimes(),$strict2PL->getTotalTime());
 //        dd($strict2PL->getScheduleString(),$strict2PL->getExecutionString(),$strict2PL->getAbortedString());
+//        --------------------------------------------Strict TO
+        $ts = new TimeStampManager();
+        $a = [];
+//        $a[] = $ts->generateTS(1);
+//        $a[] = $ts->generateTS(2);
+//        $a[] = $ts->generateTS(3);
+//        $a[] = $ts->generateTS(1);
+        dd($a);
     }
 }

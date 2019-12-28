@@ -17,7 +17,6 @@ class Strict2PL
     private $executionList = [];
 
     private $abortedList = [[]];
-    private $abortedCounter = 0;
 
     public function __construct($schedules)
     {
