@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Utilities\ScheduleGenerator;
 use App\Utilities\ScheduleReader;
+use App\Utilities\TimeStampOrdering\StrictTO;
 use App\Utilities\TimeStampOrdering\TimeStampManager;
 use App\Utilities\TwoPhaseLocking\Basic2PL;
 use App\Utilities\TwoPhaseLocking\Conservative2PL;
@@ -23,6 +24,10 @@ class IndexController extends Controller
 //        Storage::put('Schedule.txt', $result);
 //        $lk = new LockManager();
 //        $lk->sharedLock("","");
+
+        set_time_limit(3600);
+        ini_set('memory_limit', '512M');
+        ini_set('max_execution_time', '3600');
 
         $sc = new ScheduleReader("Schedule.txt");
 //        $ser = serialize($sc->readSchedules());
@@ -49,12 +54,9 @@ class IndexController extends Controller
 //        dd($strict2PL->getTimes(),$strict2PL->getTotalTime());
 //        dd($strict2PL->getScheduleString(),$strict2PL->getExecutionString(),$strict2PL->getAbortedString());
 //        --------------------------------------------Strict TO
-        $ts = new TimeStampManager();
-        $a = [];
-//        $a[] = $ts->generateTS(1);
-//        $a[] = $ts->generateTS(2);
-//        $a[] = $ts->generateTS(3);
-//        $a[] = $ts->generateTS(1);
-        dd($a);
+//        $strictTO = new StrictTO($sc->readSchedules());
+//        $strictTO->run();
+//        dd($strictTO->getTimes(),$strictTO->getAbortedString());
+//        dd($strictTO->getScheduleString(),$strictTO->getExecutionString());
     }
 }

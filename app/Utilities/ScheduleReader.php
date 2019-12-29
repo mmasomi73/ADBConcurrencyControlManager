@@ -21,8 +21,7 @@ class ScheduleReader
 
     public function getSchedule()
     {
-        $sche = new ScheduleGenerator(5,5);
-        $set =
+        $sche = new ScheduleGenerator(5,12);
         $result = $sche->generate();
         $result = $sche->getScheduleObjects();
         return $result;
