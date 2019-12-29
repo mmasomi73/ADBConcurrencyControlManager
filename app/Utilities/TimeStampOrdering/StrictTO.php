@@ -47,7 +47,7 @@ class StrictTO
             $tooMany = false;
             $doSerial = 0;
             foreach ($schedule as $operation) {
-                $result = $this->reExecute($schedule, ++$doSerial == 2);
+                $result = $this->reExecute($schedule, ++$doSerial == 1);
                 $tooMany = !$result;
                 if ($result) break;
             }

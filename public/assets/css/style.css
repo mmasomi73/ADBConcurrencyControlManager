@@ -724,6 +724,7 @@ filter: blur(3px);
     color: #5d5d5d;
     /*min-width: 800px;*/
     /*min-height: 400px;*/
+    margin-bottom: 60px;
 }
 
 .box .box-header{

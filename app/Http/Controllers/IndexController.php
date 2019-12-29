@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ScheduleExport;
 use App\Utilities\ScheduleGenerator;
 use App\Utilities\ScheduleReader;
 use App\Utilities\TimeStampOrdering\StrictTO;
@@ -11,6 +12,7 @@ use App\Utilities\TwoPhaseLocking\Conservative2PL;
 use App\Utilities\TwoPhaseLocking\LockManager;
 use App\Utilities\TwoPhaseLocking\Strict2PL;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel;
 use Storage;
 
 class IndexController extends Controller
@@ -68,11 +70,16 @@ class IndexController extends Controller
         $times = $strictTO->getTimes();
         $aborts = $strictTO->getAbortedString();
         $totalTime = $strictTO->getTotalTime();
-        $algorithm = "Strict TO";
+        $algorithm = "Basic TO";
 
 //        dd($strictTO->getTimes(),$strictTO->getAbortedString());
 //        dd($strictTO->getScheduleString(),$strictTO->getExecutionString());
 
         return view("index",compact('totalTime','schedules','executions','times','aborts','algorithm'));
+    }
+
+    public function excel()
+    {
+        return Excel::download(new ScheduleExport, 'Schedule.xlsx');
     }
 }

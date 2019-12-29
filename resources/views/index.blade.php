@@ -29,6 +29,7 @@
                             <div class="col-lg-4"></div>
                             <div class="col-lg-12 scroll">schedule: <code>{{$schedule}}</code></div>
                             <div class="col-lg-12 scroll">execution:<code>{{$executions[$key]}}</code></div>
+                            <div class="col-lg-12 scroll">Aborted:<code>{{key_exists($key,$aborts)? implode(',',$aborts[$key]) : "-"}}</code></div>
                         </div>
                     </div>
                 @endforeach
