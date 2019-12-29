@@ -9,7 +9,7 @@ class ScheduleReader
 {
     private $schedules;
 
-    public function __construct($schedulePath)
+    public function __construct($schedulePath = null)
     {
 //        $this->schedules = Storage::get($schedulePath);
     }
@@ -21,7 +21,7 @@ class ScheduleReader
 
     public function getSchedule()
     {
-        $sche = new ScheduleGenerator(5,12);
+        $sche = new ScheduleGenerator(1000,13);
         $result = $sche->generate();
         $result = $sche->getScheduleObjects();
         return $result;
@@ -29,7 +29,17 @@ class ScheduleReader
 
     public function read()
     {
-        $ser = Storage::get('serial.txt');
+        $ser = Storage::get('1000.txt');
+//        $ser = Storage::get('serial.txt');
         return \Opis\Closure\unserialize($ser);
+    }
+
+    public function serial()
+    {
+//        $sche = new ScheduleGenerator(1000,13);
+//        $result = $sche->generate();
+//        $result = $sche->getScheduleObjects();
+//        $ser = serialize($result);
+//        Storage::put('1000.txt', $ser);
     }
 }

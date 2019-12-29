@@ -5,8 +5,6 @@ namespace App\Http\Controllers;
 use App\Exports\ScheduleExport;
 use App\Utilities\ExcelHandler;
 use App\Utilities\ScheduleReader;
-use App\Utilities\TwoPhaseLocking\Conservative2PL;
-use App\Utilities\TwoPhaseLocking\Strict2PL;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 
@@ -20,6 +18,8 @@ class IndexController extends Controller
         //TODO: Fix Basic 2PL -> should be design
         //TODO: Fix Conservative infinite loop -> has some bugs
         //TODO: make artisan command for execution times
+
+//        (new ScheduleReader)->serial();
 
         $handler = new ExcelHandler();
 
@@ -40,7 +40,6 @@ class IndexController extends Controller
         $totalTime = $this->getTotalTime();
         $algorithm = $this->getAlgorithm();
 
-
         return view("index",compact('totalTime','schedules','executions','times','aborts','algorithm','request'));
     }
 
@@ -56,7 +55,9 @@ class IndexController extends Controller
         }else{
             $algorithm = "basicTO";
         }
-        return Excel::download(new ScheduleExport($handler,$algorithm), $algorithm.'.xlsx');
+        Excel::store(new ScheduleExport($handler,$algorithm), $algorithm.'.xlsx');
+//        return Excel::download(new ScheduleExport($handler,$algorithm), $algorithm.'.xlsx');
+        return "Done...";
     }
 
     private function getScheduleString()
