@@ -18,6 +18,12 @@ class IndexController extends Controller
     //
     public function index()
     {
+        //TODO: Create Downloadable Excel File
+        //TODO: Show Aborted Transactions
+        //TODO: Fix Basic TO
+        //TODO: Fix Basic 2PL
+        //TODO: Add Ajax Request
+
 //        $Sc = new ScheduleGenerator(1000,13);
 //        $result = $Sc->generate();
 //        $result = implode("\n",$result);
@@ -54,9 +60,19 @@ class IndexController extends Controller
 //        dd($strict2PL->getTimes(),$strict2PL->getTotalTime());
 //        dd($strict2PL->getScheduleString(),$strict2PL->getExecutionString(),$strict2PL->getAbortedString());
 //        --------------------------------------------Strict TO
-//        $strictTO = new StrictTO($sc->readSchedules());
-//        $strictTO->run();
+        $strictTO = new StrictTO($sc->readSchedules());
+        $strictTO->run();
+
+        $schedules = $strictTO->getScheduleString();
+        $executions = $strictTO->getExecutionString();
+        $times = $strictTO->getTimes();
+        $aborts = $strictTO->getAbortedString();
+        $totalTime = $strictTO->getTotalTime();
+        $algorithm = "Strict TO";
+
 //        dd($strictTO->getTimes(),$strictTO->getAbortedString());
 //        dd($strictTO->getScheduleString(),$strictTO->getExecutionString());
+
+        return view("index",compact('totalTime','schedules','executions','times','aborts','algorithm'));
     }
 }

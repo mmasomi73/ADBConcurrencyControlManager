@@ -1,0 +1,113 @@
+
+@media only screen and (max-width: 900px) {
+    .player-box{
+        overflow: hidden;
+    }
+    .box {
+        /*width: 90%;*/
+        /*height: 90%;*/
+        /*right: 5%;*/
+        /*min-width: 90%;*/
+        /*min-height: 90%;*/
+        /*top: 5%;*/
+        /*overflow: hidden;*/
+    }
+
+    .player-box .player {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        top: 0;
+        -webkit-transition: 2.5s;
+        transition: 2.5s;
+        z-index: 4;
+    }
+
+    .player-box .player.hider{
+        bottom: 100%;
+        top: -100%;
+    }
+
+    .player-box .playlist{
+        position: absolute;
+        left: 0;
+        right: 5px;
+        bottom: -100%;
+        top: 100%;
+        border-left: 0;
+        margin-bottom: 0;
+        -webkit-transition: 2.5s;
+        transition: 2.5s;
+        z-index: 5;
+
+    }
+    .player-box .playlist.shower{
+        bottom: 0;
+        top: 0;
+        -webkit-transition: 2.5s;
+        transition: 2.5s;
+    }
+    .player-box .playlist.hider{
+        bottom: -100%;
+        top: 100%;
+    }
+
+    .virtualizer {
+        bottom: 120px;
+    }
+
+    .player .controller {
+        height: 120px;
+    }
+
+    .player .controller .prev,
+    .player .controller .pause,
+    .player .controller .play,
+    .player .controller .stop,
+    .player .controller .next,
+    .player .controller .plist,
+    .player .controller .repeat {
+        margin-top: 60px !important;
+    }
+
+    .player .controller .volume {
+        position: absolute;
+        right: 30px;
+        top: 5px;
+        left: 30px;
+    }
+
+    .player .controller .plist{
+        display: unset;
+        opacity: 1;
+        z-index: unset;
+        top: 0;
+    }
+    .player-box .playlist .playlist-header .close{
+        display: unset;
+        opacity: 0.4;
+        background-image: url(../icons/close.png);
+    }
+
+}
+@media only screen and (max-width: 370px) {
+    .player .controller .plist {
+        display: unset;
+        opacity: 1;
+        z-index: unset;
+        top: 0;
+        margin-top: 0 !important;
+        left: 60px;
+    }
+
+    .player .controller .repeat {
+        display: unset;
+        opacity: 1;
+        z-index: unset;
+        top: 0;
+        margin-top: 0 !important;
+        left: 30px;
+    }
+
+}

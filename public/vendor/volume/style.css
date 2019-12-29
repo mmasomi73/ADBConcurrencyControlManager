@@ -1,0 +1,35 @@
+.speaker {
+    position: absolute;
+    top: 12px;
+    right: 0;
+    width: 22px;
+    height: 40px;
+}
+
+.vlCtrl {
+    position: absolute;
+    top: 10px;
+    right: 30px;
+    height: 40px;
+    width: 90px;
+    cursor: pointer;
+}
+
+svg, path {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+#ctrlCirce {
+    cursor: default;
+}
+
+.volElem {
+    fill: none;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-miterlimit: 4;
+}
