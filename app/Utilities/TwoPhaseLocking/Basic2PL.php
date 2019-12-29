@@ -114,4 +114,9 @@ class Basic2PL
         }
         return "";
     }
+
+    public function getAbortedString()
+    {
+        return [];
+    }
 }

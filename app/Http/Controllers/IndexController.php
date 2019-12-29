@@ -3,83 +3,89 @@
 namespace App\Http\Controllers;
 
 use App\Exports\ScheduleExport;
-use App\Utilities\ScheduleGenerator;
+use App\Utilities\ExcelHandler;
 use App\Utilities\ScheduleReader;
-use App\Utilities\TimeStampOrdering\StrictTO;
-use App\Utilities\TimeStampOrdering\TimeStampManager;
-use App\Utilities\TwoPhaseLocking\Basic2PL;
 use App\Utilities\TwoPhaseLocking\Conservative2PL;
-use App\Utilities\TwoPhaseLocking\LockManager;
 use App\Utilities\TwoPhaseLocking\Strict2PL;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
-use Storage;
 
 class IndexController extends Controller
 {
+    private $handler = [];
     //
-    public function index()
+    public function index(Request $request)
     {
-        //TODO: Create Downloadable Excel File
-        //TODO: Show Aborted Transactions
-        //TODO: Fix Basic TO
-        //TODO: Fix Basic 2PL
-        //TODO: Add Ajax Request
+        //TODO: Fix Basic TO -> should be  redesign
+        //TODO: Fix Basic 2PL -> should be design
+        //TODO: Fix Conservative infinite loop -> has some bugs
+        //TODO: make artisan command for execution times
 
-//        $Sc = new ScheduleGenerator(1000,13);
-//        $result = $Sc->generate();
-//        $result = implode("\n",$result);
-//        Storage::put('Schedule.txt', $result);
-//        $lk = new LockManager();
-//        $lk->sharedLock("","");
+        $handler = new ExcelHandler();
 
-        set_time_limit(3600);
-        ini_set('memory_limit', '512M');
-        ini_set('max_execution_time', '3600');
+        if ($request->get('a') == "basic2pl"){
+            $this->handler = $handler->basic2PL();
+        }elseif($request->get('a') == "conservative2pl"){
+            $this->handler = $handler->conservative2PL();
+        }elseif($request->get('a') == "strict2pl"){
+            $this->handler = $handler->strict2PL();
+        }else{
+            $this->handler = $handler->basicTO();
+        }
 
-        $sc = new ScheduleReader("Schedule.txt");
-//        $ser = serialize($sc->readSchedules());
-//        Storage::put('serial.txt', $ser);
-//        --------------------------------------------Basic 2PL
-//        $b2pl = new Basic2PL($sc->read());
-//        $b2pl->run();
-//        dd($b2pl->getTimes(),$b2pl->getTotalTime());
-//        --------------------------------------------Conservative 2PL
-//        $conservative = new Conservative2PL($sc->read());
-//        $string = "";
-//        foreach ($sc->read() as $schedule) {
-//            foreach ($schedule as $item) {
-//                $string .= $item->toString();
-//            }
-//            $string .= "\n";
-//        }
-//        dd($string);
-//        $conservative->run();
-//        dd($b2pl->getTimes(),$b2pl->getTotalTime(),$conservative->getTimes(),$conservative->getTotalTime());
-//        --------------------------------------------Strict 2PL
-//        $strict2PL = new Strict2PL($sc->read());
-//        $strict2PL->run();
-//        dd($strict2PL->getTimes(),$strict2PL->getTotalTime());
-//        dd($strict2PL->getScheduleString(),$strict2PL->getExecutionString(),$strict2PL->getAbortedString());
-//        --------------------------------------------Strict TO
-        $strictTO = new StrictTO($sc->readSchedules());
-        $strictTO->run();
+        $schedules = $this->getScheduleString();
+        $executions = $this->getExecutionString();
+        $times = $this->getTimes();
+        $aborts = $this->getAbortedString();
+        $totalTime = $this->getTotalTime();
+        $algorithm = $this->getAlgorithm();
 
-        $schedules = $strictTO->getScheduleString();
-        $executions = $strictTO->getExecutionString();
-        $times = $strictTO->getTimes();
-        $aborts = $strictTO->getAbortedString();
-        $totalTime = $strictTO->getTotalTime();
-        $algorithm = "Basic TO";
 
-//        dd($strictTO->getTimes(),$strictTO->getAbortedString());
-//        dd($strictTO->getScheduleString(),$strictTO->getExecutionString());
-
-        return view("index",compact('totalTime','schedules','executions','times','aborts','algorithm'));
+        return view("index",compact('totalTime','schedules','executions','times','aborts','algorithm','request'));
     }
 
-    public function excel()
+    public function excel(Request $request)
     {
-        return Excel::download(new ScheduleExport, 'Schedule.xlsx');
+        $handler = new ExcelHandler();
+        if ($request->get('a') == "basic2pl"){
+            $algorithm = "basic2PL";
+        }elseif($request->get('a') == "conservative2pl"){
+            $algorithm = "conservative2PL";
+        }elseif($request->get('a') == "strict2pl"){
+            $algorithm = "strict2PL";
+        }else{
+            $algorithm = "basicTO";
+        }
+        return Excel::download(new ScheduleExport($handler,$algorithm), $algorithm.'.xlsx');
+    }
+
+    private function getScheduleString()
+    {
+        return $this->handler[0];
+    }
+
+    private function getExecutionString()
+    {
+        return $this->handler[1];
+    }
+
+    private function getTimes()
+    {
+        return $this->handler[2];
+    }
+
+    private function getAbortedString()
+    {
+        return $this->handler[3];
+    }
+
+    private function getTotalTime()
+    {
+        return $this->handler[4];
+    }
+
+    private function getAlgorithm()
+    {
+        return $this->handler[5];
     }
 }

@@ -118,6 +118,11 @@ class Conservative2PL
         return $this->timeList;
     }
 
+    public function getAbortedString()
+    {
+        return [];
+    }
+
     public function getTotalTime()
     {
         return $this->totalTime;

@@ -7,7 +7,7 @@ namespace App\Utilities\TimeStampOrdering;
 use App\Utilities\Operation;
 use App\Utilities\TwoPhaseLocking\LockManager;
 
-class StrictTO
+class BasicTO
 {
     private $schedules;
     private $timeList = [];

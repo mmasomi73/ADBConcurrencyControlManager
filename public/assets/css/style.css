@@ -366,12 +366,12 @@
     background-clip: padding-box;
     border: 0;
     border-radius: 0;
-    border-bottom: 1px solid #fafafa;
+    border-bottom: 1px solid #5d5d5d;
     box-shadow: 0 0 transparent;
 }
 .modern-btn{
      background: transparent;
-     color: #fafafa;
+    color: #5d5d5d;
 
      font-weight: bold;
      border: 0;
@@ -396,7 +396,7 @@
 
 .modern-btn:focus, .modern-btn:hover,.modern-btn:active{
     background: transparent;
-    color: #fafafa;
+    color: #17a2b8;
     font-weight: bold;
     border: 0;
     box-shadow: 0 0 transparent;
@@ -753,6 +753,10 @@ filter: blur(3px);
 }
 .box .box-header .item:hover{
     color: #17a2b8;
+}
+.box .box-header .item.active{
+    color: #17a2b8;
+    font-weight: 800;
 }
 
 .player-box{

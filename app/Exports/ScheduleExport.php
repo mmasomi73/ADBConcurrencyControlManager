@@ -2,36 +2,66 @@
 
 namespace App\Exports;
 
-use App\Utilities\ScheduleReader;
-use App\Utilities\TimeStampOrdering\StrictTO;
+use App\Utilities\ExcelHandler;
 use Illuminate\Contracts\View\View;
 use Maatwebsite\Excel\Concerns\FromView;
 
 class ScheduleExport implements FromView
 {
 
-    //TODO: create Constructor and pass parameter
+    private $handler = [];
+
+    public function __construct(ExcelHandler $handler,$type = 'basic2PL')
+    {
+        try {
+            $this->handler = $handler->$type();
+        }catch (\Exception $exception){
+            dd("Dears, Please insert Algorithm name correctly please");
+        }
+    }
 
     /**
      * @inheritDoc
      */
     public function view(): View
     {
-        set_time_limit(3600);
-        ini_set('memory_limit', '512M');
-        ini_set('max_execution_time', '3600');
+        $schedules = $this->getScheduleString();
+        $executions = $this->getExecutionString();
+        $times = $this->getTimes();
+        $aborts = $this->getAbortedString();
+        $totalTime = $this->getTotalTime();
+        $algorithm = $this->getAlgorithm();
 
-        $sc = new ScheduleReader("Schedule.txt");
-        $strictTO = new StrictTO($sc->readSchedules());
-        $strictTO->run();
+        return view("excel", compact('totalTime', 'schedules', 'executions', 'times', 'aborts', 'algorithm'));
+    }
 
-        $schedules = $strictTO->getScheduleString();
-        $executions = $strictTO->getExecutionString();
-        $times = $strictTO->getTimes();
-        $aborts = $strictTO->getAbortedString();
-        $totalTime = $strictTO->getTotalTime();
-        $algorithm = "Basic TO";
+    private function getScheduleString()
+    {
+        return $this->handler[0];
+    }
 
-        return view("excel",compact('totalTime','schedules','executions','times','aborts','algorithm'));
+    private function getExecutionString()
+    {
+        return $this->handler[1];
+    }
+
+    private function getTimes()
+    {
+        return $this->handler[2];
+    }
+
+    private function getAbortedString()
+    {
+        return $this->handler[3];
+    }
+
+    private function getTotalTime()
+    {
+        return $this->handler[4];
+    }
+
+    private function getAlgorithm()
+    {
+        return $this->handler[5];
     }
 }
