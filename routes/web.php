@@ -17,3 +17,4 @@ ini_set('max_execution_time', '3600');
 
 Route::get('/', 'IndexController@index')->name('index');
 Route::get('/excel', 'IndexController@excel')->name('index.excel');
+Route::post('/ajax', 'IndexController@ajax')->name('index.ajax');

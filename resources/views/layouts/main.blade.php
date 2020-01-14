@@ -19,6 +19,7 @@
     <link href="{{asset("/vendor/loader/style.css")}}" rel="stylesheet">
     <link rel="stylesheet" href="{{asset("/assets/css/style.css")}}">
     <link rel="stylesheet" href="{{asset("/assets/css/mobile.css")}}">
+    <link rel="stylesheet" href="{{asset("/vendor/animate/animate.css")}}">
     <!-- Custom styles for this template -->
     <style>
         body {
@@ -54,10 +55,14 @@
 <script src="{{asset("/vendor/nicescroll/jquery.nicescroll.min.js")}}"></script>
 <script src="{{asset("/vendor/wavesurfer/wavesurfer.min.js")}}"></script>
 <script src="{{asset("/vendor/wavesurfer/plugin/wavesurfer.cursor.min.js")}}"></script>
+<script src="{{asset("/vendor/jquery/jquery.lettering.min.js")}}"></script>
+<script src="{{asset("/vendor/lodash/lodash.min.js")}}"></script>
 
 <script src="{{asset("/assets/js/mobile.js")}}"></script>
 <script src="{{asset("/assets/js/script.js")}}"></script>
 <script src="{{asset("/vendor/volume/index.js")}}"></script>
+@yield('js')
+
 </body>
 
 </html>
