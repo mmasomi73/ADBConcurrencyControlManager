@@ -41,7 +41,12 @@
                         <div class="border-min-bl"></div>
                         <div class="border-min-br"></div>
                         <div class="col-lg-12 text-center">
-                            <div class="init fa-2x">Choose One Of Algorithms ...</div>
+                            <div class="text-center mt-2 rtl arabic fa-2x">
+                                -[
+                                بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ
+                                ]-
+                            </div>
+                            <div class="init">Choose One Of Algorithms ...</div>
                             <div class="init">Alorithm executions may be take long time, please wait ...</div>
                             <div class="text-center mt-2 rtl arabic">
                                 حضرت موسى (علیه السلام ) در مناجات خود در كوه طور عرض كرد: یا اله العالمین (اى معبود جهانیان ).

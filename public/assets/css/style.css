@@ -1629,3 +1629,8 @@ code.blue {
         border-color: #fff;
     }
 }
+
+.arabic.fa-2x{
+    font-size: 34px;
+    color: #a8ecf7;
+}
