@@ -80,6 +80,7 @@ class Strict2PL
                         $operation->execute();
                         $exec .= $operation->toString();
                     } elseif ($result == "wait") {
+                        $this->abort();
                         $preventExecute[] = $this->abortedList[$this->executionCounter][] = $this->executionList[] = $operation->getTransaction();
                         $exec .= $this->abortString($operation);
 
@@ -91,6 +92,7 @@ class Strict2PL
                         $operation->execute();
                         $exec .= $operation->toString();
                     } else {
+                        $this->abort();
                         $preventExecute[] = $this->abortedList[$this->executionCounter][] = $this->executionList[] = $operation->getTransaction();
                         $exec .= $this->abortString($operation);
                     }
@@ -188,6 +190,11 @@ class Strict2PL
     public function getAbortedString()
     {
         return $this->abortedList;
+    }
+
+    private function abort()
+    {
+        return usleep(5 * 1000);
     }
 
 }

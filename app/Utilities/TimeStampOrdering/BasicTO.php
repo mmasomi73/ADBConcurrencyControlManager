@@ -74,6 +74,7 @@ class BasicTO
                     $exec .= $operation->toString();
                     $this->execution[$this->executionCounter] = $exec;
                 } else {
+                    $this->abort();
                     $this->abortedList[$this->executionCounter][] = $this->executionList[] = $operation->getTransaction();
                     $exec .= $this->abortString($operation);
                     $this->execution[$this->executionCounter] = $exec;
@@ -161,6 +162,7 @@ class BasicTO
     {
         $exec = key_exists($this->executionCounter, $this->execution) ? $this->execution[$this->executionCounter] : "";
         foreach ($rollbacks as $rollback) {
+            $this->abort();
             $this->abortedList[$this->executionCounter][] = $this->executionList[] = $rollback;
             $exec .= "a[" . $rollback . "]";
         }
@@ -170,5 +172,10 @@ class BasicTO
     private function abortString(Operation $operation)
     {
         return "a[" . $operation->getTransaction() . "]";
+    }
+
+    private function abort()
+    {
+        return usleep(5 * 1000);
     }
 }

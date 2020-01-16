@@ -80,4 +80,5 @@ class Operation
             return $this->operation . "(" . $this->transaction . "," . $this->item . ")";
         }
     }
+
 }

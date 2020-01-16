@@ -188,4 +188,9 @@ class Conservative2PL
         return $list;
     }
 
+    private function abort()
+    {
+        return usleep(5 * 1000);
+    }
+
 }

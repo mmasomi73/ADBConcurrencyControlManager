@@ -103,6 +103,7 @@ class Basic2PL
                         $operation->execute();
                         $exec .= $operation->toString();
                     } elseif ($result == "wait") {
+                        $this->abort();
                         $preventExecute[] = $this->abortedList[$this->executionCounter][] = $this->executionList[] = $operation->getTransaction();
                         $exec .= $this->abortString($operation);
                     } elseif ($result == "deny") {
@@ -122,6 +123,7 @@ class Basic2PL
                             if ($result == "locked") {
                                 $exec .= $this->lockString($opr);
                             } elseif ($result == "wait") {
+                                $this->abort();
                                 $preventExecute[] = $this->abortedList[$this->executionCounter][] = $this->executionList[] = $opr->getTransaction();
                                 $exec .= $this->abortString($opr);
                             }
@@ -245,5 +247,10 @@ class Basic2PL
                 $string .= "ru(" . $operation->getTransaction() . "," . $item[0] . ")";
         }
         return $string;
+    }
+
+    private function abort()
+    {
+        return usleep(5 * 1000);
     }
 }
