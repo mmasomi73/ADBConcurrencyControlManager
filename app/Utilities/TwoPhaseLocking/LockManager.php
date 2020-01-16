@@ -237,6 +237,33 @@ class LockManager
         return $list;
     }
 
+    public function unlockAllString($transaction)
+    {
+        $list = [];
+        if ($this->writeDenyList[$transaction] > 0) {
+            $this->writeDenyList[$transaction] = 0;
+        }
+        if ($this->readDenyList[$transaction] > 0) {
+            $this->readDenyList[$transaction] = 0;
+        }
+        foreach ($this->writeLockQueue as $key => $item) {
+            if ($item == $transaction) {
+                $list[] = [$key,'w'];
+                $this->removeFromWriteLockQueue($transaction, $key);
+            }
+        }
+        foreach ($this->readLockQueue as $key => $item) {
+            foreach ($item as $tr) {
+                if ($transaction == $tr) {
+                    $list[] = [$key,'r'];
+                    $this->removeFromReadLockQueue($transaction, $key);
+                }
+            }
+        }
+
+        return $list;
+    }
+
     public function hasLocked(Operation $operation)
     {
         return $this->isLocked($operation->getOperation(), $operation->getTransaction(), $operation->getItem());

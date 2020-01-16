@@ -15,9 +15,10 @@ class ExcelHandler
 
     public function __construct()
     {
-        $sc = new ScheduleReader("serial.txt");
+        $sc = new ScheduleReader();
 //        $this->schedules = $sc->readSchedules();
         $this->schedules = $sc->read();
+//        $this->schedules = $sc->readFile("test");
     }
 
     public function basic2PL()

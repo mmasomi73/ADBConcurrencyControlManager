@@ -21,6 +21,7 @@ class Strict2PL
     public function __construct($schedules)
     {
         $this->schedules = $schedules;
+        $this->schedules = $schedules;
     }
 
     public function run()

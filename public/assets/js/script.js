@@ -2,9 +2,9 @@ $('input[type="text"]').focus(function () {
     $("<div class='input-border'></div>")
 });
 $(document).ready(function () {
-    Waves.attach('.waves-float', ['waves-float']);
-    Waves.attach('.waves-circle', ['waves-circle']);
-    Waves.init();
+    // Waves.attach('.waves-float', ['waves-float']);
+    // Waves.attach('.waves-circle', ['waves-circle']);
+    // Waves.init();
     $('.background').particleground({
         dotColor: '#636363',
         lineColor: '#636363',
@@ -14,14 +14,14 @@ $(document).ready(function () {
         'margin-top': -($('.intro').height() / 2)
     });
 
-    $(".schedule-box .scroll").niceScroll({
-        cursorcolor: "#bfc2c5",
-        cursorborder: "1px solid #bfc2c5",
-        cursorwidth: "5px",
-        autohidemode: false,
-        touchbehavior: true,
-        emulatetouch: true
-    });
+    // $(".schedule-box .scroll").niceScroll({
+    //     cursorcolor: "#bfc2c5",
+    //     cursorborder: "1px solid #bfc2c5",
+    //     cursorwidth: "5px",
+    //     autohidemode: false,
+    //     touchbehavior: true,
+    //     emulatetouch: true
+    // });
 
     $('#btn').click(function () {
         let search = $(location).attr('search');

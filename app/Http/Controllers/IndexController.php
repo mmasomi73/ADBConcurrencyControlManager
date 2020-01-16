@@ -13,13 +13,16 @@ class IndexController extends Controller
 {
     private $handler = [];
     //
-    public function index(Request $request)
+    public function index()
     {
         //TODO: Fix Basic TO -> should be  redesign
         //TODO: Fix Basic 2PL -> should be design
         //TODO: Fix Conservative infinite loop -> has some bugs
         //TODO: make artisan command for execution times
 
+//        $finishGrowing = false ;$key = 8;$schedule = [1,2,3,4,5,6,7,8,9,10];
+//        $finishGrowing = $finishGrowing ? $finishGrowing : !($key + 1 < count($schedule));
+//        dd($finishGrowing,$schedule[$key]);
         return view("index");
     }
 
@@ -107,6 +110,5 @@ class IndexController extends Controller
     {
         return $this->handler[5];
     }
-
 
 }

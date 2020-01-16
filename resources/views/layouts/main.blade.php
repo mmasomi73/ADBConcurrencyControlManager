@@ -51,10 +51,10 @@
 <script src="{{asset("/vendor/bootstrap/js/bootstrap.bundle.min.js")}}"></script>
 <script src="{{asset("/vendor/particleground/jquery.particleground.min.js")}}"></script>
 <script src="{{asset("/vendor/fontawesome-5.0.9/js/fontawesome-all.min.js")}}"></script>
-<script src="{{asset("/vendor/Waves/waves.min.js")}}"></script>
-<script src="{{asset("/vendor/nicescroll/jquery.nicescroll.min.js")}}"></script>
-<script src="{{asset("/vendor/wavesurfer/wavesurfer.min.js")}}"></script>
-<script src="{{asset("/vendor/wavesurfer/plugin/wavesurfer.cursor.min.js")}}"></script>
+{{--<script src="{{asset("/vendor/Waves/waves.min.js")}}"></script>--}}
+{{--<script src="{{asset("/vendor/nicescroll/jquery.nicescroll.min.js")}}"></script>--}}
+{{--<script src="{{asset("/vendor/wavesurfer/wavesurfer.min.js")}}"></script>--}}
+{{--<script src="{{asset("/vendor/wavesurfer/plugin/wavesurfer.cursor.min.js")}}"></script>--}}
 <script src="{{asset("/vendor/jquery/jquery.lettering.min.js")}}"></script>
 <script src="{{asset("/vendor/lodash/lodash.min.js")}}"></script>
 
