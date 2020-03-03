@@ -83,7 +83,7 @@ class Strict2PL
                         $this->abort();
                         $preventExecute[] = $this->abortedList[$this->executionCounter][] = $this->executionList[] = $operation->getTransaction();
                         $exec .= $this->abortString($operation);
-
+                        $exec .= $this->unlockAllString($lockManager->unlockAllString($operation->getTransaction()), $operation);
                     }
                 }
 
@@ -95,6 +95,7 @@ class Strict2PL
                         $this->abort();
                         $preventExecute[] = $this->abortedList[$this->executionCounter][] = $this->executionList[] = $operation->getTransaction();
                         $exec .= $this->abortString($operation);
+                        $exec .= $this->unlockAllString($lockManager->unlockAllString($operation->getTransaction()), $operation);
                     }
                 }
                 if ($operation->getOperation() == "c" || $operation->getOperation() == "a") {
@@ -117,6 +118,7 @@ class Strict2PL
     private function reExecute($schedule, LockManager $lockManager)
     {
         $reExecution = $this->executionList;
+        $this->executionList = [];
         $newSchedule = [];
         foreach ($schedule as $operation) {
             if (in_array($operation->getTransaction(), $reExecution)) {

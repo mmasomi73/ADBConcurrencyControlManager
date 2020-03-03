@@ -30,9 +30,9 @@ class Conservative2PL
             $this->execute($schedule, $lockManager);
 
             $counter = count($schedule);
-            while (count($this->executionList) > 0 && $counter-- > 0) {
-                $this->reExecute($schedule,$lockManager);
-                if (count($this->executionList) == 0)break;
+            while (count($this->executionList) >= 0 && $counter-- >= 0) {
+                $this->reExecute($schedule);
+                if (count($this->executionList) == 0) break;
             }
             $this->executionCounter++;
             $end = microtime(TRUE);
@@ -108,8 +108,9 @@ class Conservative2PL
         }
     }
 
-    public function reExecute($schedule, LockManager $lockManager)
+    public function reExecute($schedule)
     {
+        $lockManager = new LockManager();
         $reExecution = $this->executionList;
         $newSchedule = [];
         foreach ($schedule as $operation) {
@@ -118,6 +119,7 @@ class Conservative2PL
             }
         }
         $this->execute($newSchedule, $lockManager);
+
     }
 
     public function getTimes()

@@ -16,11 +16,6 @@ class LockManager
     public function __construct($downUpgrading = false)
     {
         $this->downUpgrading = $downUpgrading;
-        for ($i = 1; $i < 8; $i++) {
-            $this->readDenyList[$i . ""] = 0;
-            $this->writeDenyList[$i . ""] = 0;
-
-        }
     }
 
     public function lock(Operation $operation)
@@ -29,6 +24,7 @@ class LockManager
         if ($operation->getOperation() == "w") return $this->exclusiveLock($operation);
         if ($operation->getOperation() == "c" || $operation->getOperation() == "a")
             return "finish";
+        return "";
     }
 
     public function sharedLock(Operation $operation)
@@ -55,8 +51,9 @@ class LockManager
     public function unLock(Operation $operation)
     {
         if ($operation->getOperation() == "w") {
-            if ($this->writeDenyList[$operation->getTransaction()] > 0) {
-                $this->writeDenyList[$operation->getTransaction()] = $this->writeDenyList[$operation->getTransaction()] - 1;
+            if ($this->isIgnoredLock($operation->getTransaction(),$operation->getItem(),'w')) {
+//                $this->writeDenyList[$operation->getTransaction()] = $this->writeDenyList[$operation->getTransaction()] - 1;
+                $this->unIgnoreLock($operation->getTransaction(),$operation->getItem(),'w');
                 return 'deny';
             } else {
                 $this->removeFromWriteLockQueue($operation->getTransaction(), $operation->getItem());
@@ -64,8 +61,9 @@ class LockManager
             }
         }
         if ($operation->getOperation() == "r") {
-            if ($this->readDenyList[$operation->getTransaction()] > 0) {
-                $this->readDenyList[$operation->getTransaction()] = $this->readDenyList[$operation->getTransaction()] - 1;
+            if ($this->isIgnoredLock($operation->getTransaction(),$operation->getItem(),'r')) {
+//                $this->readDenyList[$operation->getTransaction()] = $this->readDenyList[$operation->getTransaction()] - 1;
+                $this->unIgnoreLock($operation->getTransaction(),$operation->getItem(),'r');
                 return 'deny';
             } else {
                 $this->removeFromReadLockQueue($operation->getTransaction(), $operation->getItem());
@@ -73,12 +71,9 @@ class LockManager
             }
         }
         if ($operation->getOperation() == "c" || $operation->getOperation() == "a") {
-            if ($this->writeDenyList[$operation->getTransaction()] > 0) {
-                $this->writeDenyList[$operation->getTransaction()] = 0;
-            }
-            if ($this->readDenyList[$operation->getTransaction()] > 0) {
-                $this->readDenyList[$operation->getTransaction()] = 0;
-            }
+            $this->unIgnoreAll($operation->getTransaction(),'r');
+            $this->unIgnoreAll($operation->getTransaction(),'w');
+
             foreach ($this->writeLockQueue as $key => $item) {
                 if ($item == $operation->getTransaction()) $this->removeFromWriteLockQueue($operation->getTransaction(), $key);
             }
@@ -115,12 +110,14 @@ class LockManager
 
             // if this transaction lock this item previous in shared mode, add to DENY_LIST and can give lock
             elseif ($this->isLocked("r", $transaction, $item)) {
-                $this->readDenyList[$transaction] = $this->readDenyList[$transaction] + 1;
+                //TODO: ignore
+                $this->ignoreLock($transaction, $item,"r");
                 return 'deny';
             } // if this transaction lock this item previous in exclusive mode, can give lock
             elseif ($this->isLocked("w", $transaction, $item)) {
                 // Downgrade Lock => in practice remove from Write Lock Queue
-                $this->downUpgrading ? $this->removeFromWriteLockQueue($transaction, $item) : null;
+//                $this->downUpgrading ? $this->removeFromWriteLockQueue($transaction, $item) : null;
+                $this->ignoreLock($transaction, $item,"r");
                 return 'deny';
             }
         }
@@ -140,11 +137,13 @@ class LockManager
             // if this transaction lock this item previous in shared mode, add to DENY_LIST and can give lock
             elseif ($this->isLocked("r", $transaction, $item)) {
                 // Upgrading Lock
-                $this->downUpgrading ? $this->removeFromReadLockQueue($transaction, $item) : null;
+//                $this->downUpgrading ? $this->removeFromReadLockQueue($transaction, $item) : null;
+                $this->ignoreLock($transaction, $item,"w");
                 return 'deny';
             } // if this transaction lock this item previous in exclusive mode, can give lock
             elseif ($this->isLocked("w", $transaction, $item)) {
-                $this->writeDenyList[$transaction] = $this->writeDenyList[$transaction] + 1;
+//                $this->writeDenyList[$transaction] = $this->writeDenyList[$transaction] + 1;
+                $this->ignoreLock($transaction, $item,"w");
                 return 'deny';
             }
         }
@@ -168,7 +167,7 @@ class LockManager
     private function checkWriteLockQueue($transaction, $item)
     {
         if (array_key_exists($item, $this->writeLockQueue)) {
-            return $this->writeLockQueue[$item] != $transaction;
+            return !($this->writeLockQueue[$item] == $transaction);
         }
         return false;
     }
@@ -176,7 +175,10 @@ class LockManager
     private function checkReadLockQueue($transaction, $item)
     {
         if (array_key_exists($item, $this->readLockQueue)) {
-            return in_array($transaction, $this->readLockQueue[$item]);
+            if (in_array($transaction, $this->readLockQueue[$item])){
+                return count($this->readLockQueue[$item]) > 1;
+            }
+            return count($this->readLockQueue[$item]) > 0;
         }
         return false;
     }
@@ -213,12 +215,8 @@ class LockManager
     public function unlockAll($transaction)
     {
         $list = [];
-        if ($this->writeDenyList[$transaction] > 0) {
-            $this->writeDenyList[$transaction] = 0;
-        }
-        if ($this->readDenyList[$transaction] > 0) {
-            $this->readDenyList[$transaction] = 0;
-        }
+        $this->unIgnoreAll($transaction,'r');
+        $this->unIgnoreAll($transaction,'w');
         foreach ($this->writeLockQueue as $key => $item) {
             if ($item == $transaction) {
                 $list[] = $key;
@@ -240,12 +238,9 @@ class LockManager
     public function unlockAllString($transaction)
     {
         $list = [];
-        if ($this->writeDenyList[$transaction] > 0) {
-            $this->writeDenyList[$transaction] = 0;
-        }
-        if ($this->readDenyList[$transaction] > 0) {
-            $this->readDenyList[$transaction] = 0;
-        }
+
+        $this->unIgnoreAll($transaction,'r');
+        $this->unIgnoreAll($transaction,'w');
         foreach ($this->writeLockQueue as $key => $item) {
             if ($item == $transaction) {
                 $list[] = [$key,'w'];
@@ -283,5 +278,88 @@ class LockManager
             }
         }
         return false;
+    }
+
+    private function ignoreLock($transaction,$item, $type = 'r')
+    {
+        if ($type == 'r'){
+            $ignore = 0;
+            if (array_key_exists($transaction,$this->readDenyList)){
+                $tri = $this->readDenyList[$transaction];
+                if (is_array($tri) && array_key_exists($item,$tri)){
+                    $ignore = $tri[$item];
+                }
+            }
+            $this->readDenyList[$transaction][$item]= $ignore + 1;
+        }
+        if ($type == 'w'){
+            $ignore = 0;
+            if (array_key_exists($transaction,$this->writeDenyList)){
+                $tri = $this->writeDenyList[$transaction];
+                if (is_array($tri) && array_key_exists($item,$tri)){
+                    $ignore = $tri[$item];
+                }
+            }
+            $this->writeDenyList[$transaction][$item]= $ignore + 1;
+        }
+    }
+
+    private function isIgnoredLock($transaction,$item, $type = 'r')
+    {
+        if ($type == 'r'){
+            $ignore = 0;
+            if (array_key_exists($transaction,$this->readDenyList)){
+                $tri = $this->readDenyList[$transaction];
+                if (is_array($tri) && array_key_exists($item,$tri)){
+                    $ignore = $tri[$item];
+                }
+            }
+            if ($ignore > 0) return true; else return false;
+        }
+        if ($type == 'w'){
+            $ignore = 0;
+            if (array_key_exists($transaction,$this->writeDenyList)){
+                $tri = $this->writeDenyList[$transaction];
+                if (is_array($tri) && array_key_exists($item,$tri)){
+                    $ignore = $tri[$item];
+                }
+            }
+            if ($ignore > 0) return true; else return false;
+        }
+        return false;
+    }
+
+    private function unIgnoreLock($transaction,$item, $type = 'r')
+    {
+        if ($type == 'r'){
+            $ignore = 0;
+            if (array_key_exists($transaction,$this->readDenyList)){
+                $tri = $this->readDenyList[$transaction];
+                if (is_array($tri) && array_key_exists($item,$tri)){
+                    $ignore = $tri[$item];
+                }
+            }
+            $this->readDenyList[$transaction][$item]= $ignore - 1;
+        }
+        if ($type == 'w'){
+            $ignore = 0;
+            if (array_key_exists($transaction,$this->writeDenyList)){
+                $tri = $this->writeDenyList[$transaction];
+                if (is_array($tri) && array_key_exists($item,$tri)){
+                    $ignore = $tri[$item];
+                }
+            }
+            $this->writeDenyList[$transaction][$item]= $ignore - 1;
+        }
+    }
+
+    private function unIgnoreAll($transaction, $type = 'r')
+    {
+        if ($type == 'r'){
+            $this->readDenyList[$transaction]= [];
+        }
+        if ($type == 'w'){
+            $this->writeDenyList[$transaction]= [];
+        }
     }
 }

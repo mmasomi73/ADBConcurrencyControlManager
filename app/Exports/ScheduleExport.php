@@ -16,6 +16,7 @@ class ScheduleExport implements FromView
         try {
             $this->handler = $handler->$type();
         }catch (\Exception $exception){
+            dd($exception);
             dd("Dears, Please insert Algorithm name correctly please");
         }
     }

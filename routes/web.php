@@ -17,4 +17,9 @@ ini_set('max_execution_time', '3600');
 
 Route::get('/', 'IndexController@index')->name('index');
 Route::get('/excel', 'IndexController@excel')->name('index.excel');
-Route::any('/ajax', 'IndexController@ajax')->name('index.ajax');
+Route::get('/ajax', 'IndexController@ajax')->name('index.ajax');
+Route::get('/ins', 'IndexController@insertSchedules')->name('index.insertSchedules');
+Route::get('/panel', 'IndexController@panel')->name('index.panel');
+
+Route::get('/schedule', 'ScheduleController@index')->name('schedule.index');
+Route::get('/schedule/{id}', 'ScheduleController@view')->name('schedule.view');

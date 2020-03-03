@@ -17,8 +17,15 @@ class ExcelHandler
     {
         $sc = new ScheduleReader();
 //        $this->schedules = $sc->readSchedules();
-        $this->schedules = $sc->read();
-//        $this->schedules = $sc->readFile("test");
+//        $this->schedules = $sc->read();
+//        $this->schedules = $sc->readFile("Schedule.txt");
+        $this->schedules = $sc->readFile("main.txt");
+    }
+
+    public function getSchedules()
+    {
+        $sc = new ScheduleReader();
+        return $sc->readLines("Schedule.txt");
     }
 
     public function basic2PL()

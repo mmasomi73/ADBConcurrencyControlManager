@@ -62,6 +62,16 @@ class ScheduleReader
         return $schedulesList;
     }
 
+    public function readLines($path)
+    {
+        $schedules = Storage::get($path);
+        $schedulesList = [];
+        foreach(preg_split("/((\r?\n)|(\r\n?))/", $schedules) as $line){
+            $schedulesList[] = $line;
+        }
+        return $schedulesList;
+    }
+
     private function createOperation($operation)
     {
         $opr = "";

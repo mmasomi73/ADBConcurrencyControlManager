@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Exports\ScheduleExport;
+use App\Repositories\ScheduleRepository;
+use App\Schedule;
 use App\Utilities\ExcelHandler;
 use App\Utilities\ScheduleReader;
 use Illuminate\Http\Request;
@@ -70,6 +72,24 @@ class IndexController extends Controller
         }
 
         return ['totalTime'=>$totalTime,'algorithm'=>$algorithm,'schedules'=>$data];
+    }
+
+    public function insertSchedules()
+    {
+        dd("This Functions is very Dangerous");
+        $handler = new ExcelHandler();
+        dd((new ScheduleRepository)->store($handler->getSchedules()));
+        dd($handler->getSchedules());
+    }
+
+    public function panel()
+    {
+        return view('admin.index.index');
+    }
+
+    public function schedules()
+    {
+
     }
 
 //------------------------------------------= Private Methods

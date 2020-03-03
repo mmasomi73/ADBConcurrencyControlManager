@@ -106,6 +106,7 @@ class Basic2PL
                         $this->abort();
                         $preventExecute[] = $this->abortedList[$this->executionCounter][] = $this->executionList[] = $operation->getTransaction();
                         $exec .= $this->abortString($operation);
+                        $exec .= $this->unlockAllString($lockManager->unlockAllString($operation->getTransaction()), $operation);
                     } elseif ($result == "deny") {
                         $operation->execute();
                         $exec .= $operation->toString();
@@ -126,6 +127,7 @@ class Basic2PL
                                 $this->abort();
                                 $preventExecute[] = $this->abortedList[$this->executionCounter][] = $this->executionList[] = $opr->getTransaction();
                                 $exec .= $this->abortString($opr);
+                                $exec .= $this->unlockAllString($lockManager->unlockAllString($operation->getTransaction()), $operation);
                             }
                         }
                         $this->execution[$this->executionCounter] = $exec;
@@ -160,6 +162,8 @@ class Basic2PL
     {
         $lockManager = new LockManager();
         $reExecution = $this->executionList;
+        $this->executionList = [];
+
         $newSchedule = [];
         foreach ($schedule as $operation) {
             if (in_array($operation->getTransaction(), $reExecution)) {
@@ -180,6 +184,7 @@ class Basic2PL
                 $this->shrinking($operation, $lockManager, $preventExecute);
             }
         }
+        return count($preventExecute);
     }
 
     public function getTimes()

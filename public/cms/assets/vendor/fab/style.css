@@ -1,0 +1,83 @@
+
+.fab-container {
+    margin: 1em;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    height: 56px;
+    cursor: pointer;
+}
+
+.fab-container:hover{
+    height: 186px;
+}
+
+.fab-container:hover .fab-buttons:not(:last-of-type) {
+    width: 40px;
+    height: 40px;
+    margin: 15px auto 0;
+    opacity: 1;
+    margin-left: 10px
+}
+
+.fab-buttons {
+    display: block;
+    width: 35px;
+    height: 35px;
+    margin: 20px auto 0;
+    text-decoration: none;
+    position: relative;
+    border-radius: 50%;
+    box-shadow: 0px 5px 13px 11px rgba(0, 0, 0, 0.18), 0px 4px 12px -7px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    transition: .2s;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.fab-buttons:nth-last-of-type(2) {
+    transition-delay: 20ms;
+}
+
+.fab-buttons:nth-last-of-type(3) {
+    transition-delay: 40ms;
+}
+
+.fab-buttons:nth-last-of-type(1) {
+    width: 56px;
+    height: 56px;
+    opacity: 1;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 33px;
+    color: #60615b;
+    background: white;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+
+}
+
+.fab-buttons:nth-last-of-type(2) {
+    color: #60615b;
+    background: white;
+}
+
+.fab-buttons:nth-last-of-type(3) {
+    color: #60615b;
+    background: white;
+}
+
+.fab-container:hover .fab-buttons:nth-last-of-type(1) {
+    transform: rotate(45deg);
+}
+
+.fab-buttons:hover {
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.14), 0 4px 8px rgba(0, 0, 0, 0.28);
+}
+
+

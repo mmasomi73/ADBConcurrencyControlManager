@@ -1634,3 +1634,5 @@ code.blue {
     font-size: 34px;
     color: #a8ecf7;
 }
+::-moz-selection { background: #4b4b4b; color: #a8ecf7}
+::selection { background: #4b4b4b; color: #a8ecf7}
