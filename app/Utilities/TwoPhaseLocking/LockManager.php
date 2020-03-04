@@ -33,7 +33,8 @@ class LockManager
         if ($result == 'not') {
             return 'wait';
         }
-        $this->AddToReadLockQueue($operation->getTransaction(), $operation->getItem());
+        if ($result != 'deny')
+            $this->AddToReadLockQueue($operation->getTransaction(), $operation->getItem());
         return $result == 'ok' ? 'locked' : 'deny';
 
     }
@@ -44,7 +45,8 @@ class LockManager
         if ($result == 'not') {
             return 'wait';
         }
-        $this->AddToWriteLockQueue($operation->getTransaction(), $operation->getItem());
+        if ($result != 'deny')
+            $this->AddToWriteLockQueue($operation->getTransaction(), $operation->getItem());
         return $result == 'ok' ? 'locked' : 'deny';
     }
 
@@ -176,7 +178,8 @@ class LockManager
     {
         if (array_key_exists($item, $this->readLockQueue)) {
             if (in_array($transaction, $this->readLockQueue[$item])){
-                return count($this->readLockQueue[$item]) > 1;
+                $result = array_unique($this->readLockQueue[$item]);
+                return count($result) > 1;
             }
             return count($this->readLockQueue[$item]) > 0;
         }

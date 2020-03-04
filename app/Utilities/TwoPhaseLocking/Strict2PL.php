@@ -83,7 +83,7 @@ class Strict2PL
                         $this->abort();
                         $preventExecute[] = $this->abortedList[$this->executionCounter][] = $this->executionList[] = $operation->getTransaction();
                         $exec .= $this->abortString($operation);
-                        $exec .= $this->unlockAllString($lockManager->unlockAllString($operation->getTransaction()), $operation);
+                        $exec .= $this->unlockAllString2($lockManager->unlockAllString($operation->getTransaction()), $operation);
                     }
                 }
 
@@ -95,7 +95,7 @@ class Strict2PL
                         $this->abort();
                         $preventExecute[] = $this->abortedList[$this->executionCounter][] = $this->executionList[] = $operation->getTransaction();
                         $exec .= $this->abortString($operation);
-                        $exec .= $this->unlockAllString($lockManager->unlockAllString($operation->getTransaction()), $operation);
+                        $exec .= $this->unlockAllString2($lockManager->unlockAllString($operation->getTransaction()), $operation);
                     }
                 }
                 if ($operation->getOperation() == "c" || $operation->getOperation() == "a") {
@@ -192,6 +192,18 @@ class Strict2PL
     public function getAbortedString()
     {
         return $this->abortedList;
+    }
+
+    private function unlockAllString2($lockList, Operation $operation)
+    {
+        $string = "";
+        foreach ($lockList as $item) {
+            if ($item[1] == 'w')
+                $string .= "wu(" . $operation->getTransaction() . "," . $item[0] . ")";
+            else
+                $string .= "ru(" . $operation->getTransaction() . "," . $item[0] . ")";
+        }
+        return $string;
     }
 
     private function abort()
