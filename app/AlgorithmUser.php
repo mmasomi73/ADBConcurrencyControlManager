@@ -4,25 +4,14 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Executed extends Model
+class AlgorithmUser extends Model
 {
-
-    public $timestamps = true;
-    protected $table = 'executions';
+    public $timestamps = false;
+    protected $table = 'algorithm_user';
     protected $fillable = [
-        'executed',
-        'time',
-        'aborted',
-        'aborts',
         'user_id',
-        'schedule_id',
         'algorithm_id',
     ];
-
-    public function schedule()
-    {
-        return $this->belongsTo(Schedule::class,'schedule_id');
-    }
 
     public function user()
     {

@@ -42,7 +42,7 @@ $(document).ready(function() {
     $(".card-header-right .minimize-card").on('click', function() {
         var $this = $(this);
         var port = $($this.parents('.card'));
-        var card = $(port).children('.card-block').slideToggle();
+        var card = $(port).children('.card-block').not(".tab-content").slideToggle();
         $(this).toggleClass("icon-minus").fadeIn('slow');
         $(this).toggleClass("icon-plus").fadeIn('slow');
     });

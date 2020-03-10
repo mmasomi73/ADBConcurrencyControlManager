@@ -19,4 +19,14 @@ class User extends Model
     {
         return $this->hasMany(Executed::class,'user_id','id');
     }
+
+    public function algorithms()
+    {
+        return $this->hasMany(AlgorithmUser::class,'user_id','id');
+    }
+
+    public function getFullName()
+    {
+        return $this->name . ' ' . $this->family;
+    }
 }

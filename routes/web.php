@@ -21,5 +21,11 @@ Route::get('/ajax', 'IndexController@ajax')->name('index.ajax');
 Route::get('/ins', 'IndexController@insertSchedules')->name('index.insertSchedules');
 Route::get('/panel', 'IndexController@panel')->name('index.panel');
 
-Route::get('/schedule', 'ScheduleController@index')->name('schedule.index');
+Route::get('/users', 'UserController@index')->name('user.index');
+Route::get('/user/{id}', 'UserController@view')->name('user.view');
+
+Route::get('/schedules', 'ScheduleController@index')->name('schedule.index');
+Route::get('/store', 'ScheduleController@readOutputs')->name('schedule.store');
 Route::get('/schedule/{id}', 'ScheduleController@view')->name('schedule.view');
+
+Route::get('/executions', 'ScheduleController@executions')->name('executions.index');

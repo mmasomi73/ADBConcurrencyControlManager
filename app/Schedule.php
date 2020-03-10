@@ -16,7 +16,7 @@ class Schedule extends Model
 
     public function executions()
     {
-        return $this->hasMany(Executed::class,'	schedule_id','id');
+        return $this->hasMany(Executed::class,'schedule_id','id');
     }
 
     public function getObject()
