@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Algorithm;
+use App\Executed;
 use App\Exports\ScheduleExport;
 use App\Repositories\ScheduleRepository;
 use App\Schedule;
+use App\User;
 use App\Utilities\ExcelHandler;
 use App\Utilities\ScheduleReader;
 use Illuminate\Http\Request;
@@ -84,7 +87,11 @@ class IndexController extends Controller
 
     public function panel()
     {
-        return view('admin.index.index');
+        $users = User::with('algorithms.algorithm')->orderByDesc('id')->paginate(14);
+        $algorithms = Algorithm::count();
+        $schedules = Schedule::count();
+        $executions = Executed::count();
+        return view('admin.index.index',compact('users','algorithms','schedules','executions'));
     }
 
     public function schedules()

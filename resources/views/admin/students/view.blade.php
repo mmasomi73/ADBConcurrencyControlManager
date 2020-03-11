@@ -157,7 +157,10 @@
                                             Time : {{$execution->time}}
                                         </div>
                                         <div class="sch-abt">
-                                           Aborted Numbers : {{$execution->aborted}}
+                                            | Aborted Numbers : {{$execution->aborted}}
+                                        </div>
+                                        <div class="sch-abt">
+                                             | Algorithm : {{$execution->algorithm->name}}
                                         </div>
                                         <div class="code-style w-100">
                                             <code>
@@ -170,7 +173,7 @@
                                                 {{$execution->schedule->schedule}}
                                             </code>
                                             <code>
-                                                {{$execution->executed}}
+                                                {{exFormatter($execution->executed)}}
                                             </code>
                                         </div>
                                     </div>

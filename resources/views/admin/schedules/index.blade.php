@@ -271,7 +271,7 @@
 
                                                                     <div class="code-style w-100">
                                                                         <code>
-                                                                            {{$execution->executed}}
+                                                                            {{exFormatter($execution->executed)}}
                                                                         </code>
                                                                     </div>
                                                                 </div>

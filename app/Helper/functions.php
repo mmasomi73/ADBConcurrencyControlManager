@@ -18,7 +18,6 @@ function getRowNumber($paginationElem, &$counter)
     return (($paginationElem->currentPage() - 1) * $paginationElem->perPage()) + ++$counter;
 }
 
-
 function getProfile($user = null)
 {
     $profiles = [
@@ -57,4 +56,51 @@ function getProfile($user = null)
         return 'cms/uploads/avatar/'.$profiles[$user];
     }
     return 'cms/uploads/avatar/'.$profiles[array_rand($profiles)];
+}
+
+function exFormatter($execution){
+    $execution = str_replace(';', '', $execution);
+    $re = '/[c a A]{1}\([1-7]{1}\)|[w r l u]{2}\([ 1-7]{1},[x y z w v]?\)|[w r]{1}\([ 1-7]{1},[x y z w v]?\)|[a]{1}\[[1-7]\]|[w r]_lock\([1-7]{1},[x y z w v]{1}\)/mi';
+    preg_match_all($re, $execution, $matches, PREG_SET_ORDER, 0);
+
+    $result = [];
+
+    foreach ($matches as $match) {
+        $match = $match[0];
+        if (strpos($match, '(') !== false){
+            $match = str_replace(')', '', $match);
+            $opr = explode('(',$match);
+            if (count($opr) > 1){
+                if (strtolower($opr[0]) == 'rl' || strtolower($opr[0]) == 'r_lock'){
+                    $result[] = 'rl('.$opr[1].')';
+                }elseif (strtolower($opr[0]) == 'wl' || strtolower($opr[0]) == 'w_lock'){
+                    $result[] = 'wl('.$opr[1].')';
+                }elseif (strtolower($opr[0]) == 'w' || strtolower($opr[0]) == 'w'){
+                    $result[] = 'w('.$opr[1].')';
+                }elseif (strtolower($opr[0]) == 'r' || strtolower($opr[0]) == 'r'){
+                    $result[] = 'r('.$opr[1].')';
+                }elseif ($opr[0] == 'a'){
+                    $result[] = 'a('.$opr[1].')';
+                }elseif ($opr[0] == 'A'){
+                    $result[] = 'A['.$opr[1].']';
+                }elseif ($opr[0] == 'c'){
+                    $result[] = 'c('.$opr[1].')';
+                }
+            }
+        }
+        elseif (strpos($match, '[') !== false){
+            $match = str_replace(']', '', $match);
+            $opr = explode('[',$match);
+            if (count($opr) > 1){
+                if ($opr[0] == 'a'){
+                    $result[] = 'a['.$opr[1].']';
+                }elseif ($opr[0] == 'A'){
+                    $result[] = 'A['.$opr[1].']';
+                }
+            }
+        }
+        else $result[] = $match;
+
+    }
+     return implode('',$result);
 }

@@ -24,8 +24,8 @@
                 <li class="user-profile header-notification">
                     <div class="dropdown-primary dropdown">
                         <div class="dropdown-toggle" data-toggle="dropdown">
-                            <span class="float-right">میثم معصومی</span>
-                            <img src="/cms/assets/images/avatar-4.jpg" class="img-radius" alt="میثم معصومی">
+                            <span class="float-right">دکتر صنعتی</span>
+                            <img src="/cms/assets/images/avatar-4.jpg" class="img-radius" alt="دکتر صنعتی">
                         </div>
                     </div>
                 </li>
